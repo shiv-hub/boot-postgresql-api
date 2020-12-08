@@ -8,9 +8,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 
-
-
-
 @Entity
 @Table(name = "users")
 public class User {
@@ -20,16 +17,10 @@ public class User {
 	private long uid;
 	@Column
 	private String pwd;
+	@Column
+	private String email;
 	public long getUid() {
 		return uid;
-	}
-	public User() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-	public User(String pwd) {
-		super();
-		this.pwd = pwd;
 	}
 	public void setUid(long uid) {
 		this.uid = uid;
@@ -40,4 +31,23 @@ public class User {
 	public void setPwd(String pwd) {
 		this.pwd = pwd;
 	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	public User(String pwd, String email) {
+		super();
+		this.pwd = pwd;
+		this.email = email;
+	}
+	public User() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	
+	
+
+
 }

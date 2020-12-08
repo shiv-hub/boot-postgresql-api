@@ -1,6 +1,6 @@
 INSERT INTO public.users
-(pwd)
-VALUES('abc1');
+(email, pwd)
+VALUES('test@email.com', 'abc1');
 INSERT INTO public.users
-(pwd)
-VALUES('abc2');
+(email, pwd)
+VALUES('test1@email.com', 'abc2');
