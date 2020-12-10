@@ -16,9 +16,26 @@ public class User {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long uid;
 	@Column
+	private String userName;
+	
+	@Column
 	private String pwd;
 	@Column
 	private String email;
+	public User(long uid, String userName, String pwd, String email) {
+		super();
+		
+		this.userName = userName;
+		this.pwd = pwd;
+		this.email = email;
+	}
+	public String getUserName() {
+		return userName;
+	}
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+	
 	public long getUid() {
 		return uid;
 	}
@@ -37,11 +54,7 @@ public class User {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	public User(String pwd, String email) {
-		super();
-		this.pwd = pwd;
-		this.email = email;
-	}
+
 	public User() {
 		super();
 		// TODO Auto-generated constructor stub

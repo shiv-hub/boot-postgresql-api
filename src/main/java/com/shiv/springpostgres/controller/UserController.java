@@ -1,12 +1,13 @@
 package com.shiv.springpostgres.controller;
 
-import java.util.HashMap;
+import java.util.HashMap; 
 import java.util.List;
 import java.util.Map;
-
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,13 +17,25 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+
+
 import com.shiv.springpostgres.exception.ResourceNotFoundException;
+import com.shiv.springpostgres.model.AuthRequest;
 import com.shiv.springpostgres.model.User;
+import com.shiv.springpostgres.model.UserLogged;
 import com.shiv.springpostgres.repository.UserRepository;
+import com.shiv.springpostgres.util.JwtUtil;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin
 public class UserController {
+	
+	 @Autowired
+	    private JwtUtil jwtUtil;
+	    @Autowired
+	    private AuthenticationManager authenticationManager;
 
 	@Autowired
 	private UserRepository userrepository;
@@ -31,6 +44,8 @@ public class UserController {
 	// for getting all users
 	@GetMapping("/users")
 	public List<User> getAllUser(){
+		//checking end point
+		System.out.println("hello Check /users end points");
 		return this.userrepository.findAll();
 	}
 	
@@ -44,13 +59,26 @@ public class UserController {
 	
 	
 	//Find by Email
-	@GetMapping("/users/email/{email}")
-	public ResponseEntity<User> getUserById(@PathVariable(value = "email") String email)
-			throws ResourceNotFoundException {
-		User user = this.userrepository.findByEmail(email)
-				.orElseThrow(() -> new ResourceNotFoundException("User not found for this email :: " + email));
-		return ResponseEntity.ok().body(user);
-	}
+//	@PostMapping("/users/login")
+//	public ResponseEntity<User> getUserById(@RequestBody UserLogin userlogin)
+//			throws ResourceNotFoundException {
+//		User user = this.userrepository.findByEmail(userlogin.getEmail())
+//				.orElseThrow(() -> new ResourceNotFoundException("User not found for this email :: " + userlogin.getEmail()));
+//		
+//		if(
+//			(user.getPwd()).equals(userlogin.getPwd()))
+//		{
+//			return ResponseEntity.ok().body(user);
+//		}
+//		else {
+//			user.setUid(0);
+//			user.setEmail(null);
+//			user.setPwd(null);
+//			return ResponseEntity.badRequest().body(user);
+//		}
+//			
+//		
+//	}
 	
 	//for posting a user
 	@PostMapping("/user")
@@ -83,4 +111,24 @@ public class UserController {
 		response.put("deleted", Boolean.TRUE);
 		return response;
 	}
+	
+	@PostMapping("/authenticate")
+    public UserLogged generateToken(@RequestBody AuthRequest authRequest) throws Exception {
+    
+		UserLogged userlogged=new UserLogged(null,null);;
+		try {
+        	
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(authRequest.getUserName(), authRequest.getPwd())
+            );
+        } catch (Exception ex) {
+            throw new Exception("inavalid username/password");
+        }
+		
+			User user=userrepository.findByUserName(authRequest.getUserName());
+        	userlogged.setToken(jwtUtil.generateToken(authRequest.getUserName()));
+        	userlogged.setUserName(user.getUserName());
+        	return userlogged;
+    }
+	
 }
